@@ -8,6 +8,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from model import User, Rating, connect_to_db, db
 
+from sqlalchemy.orm.exc import NoResultFound
+
 
 app = Flask(__name__)
 
@@ -49,17 +51,32 @@ def register_process():
 
     password = request.form.get("password")
 
+    try:
+        db.session.query(User).filter_by(email=username).one().email
+        password == db.session.query(User).filter_by(email=username).one().password
+    except:
+        flash("Login information inccorect")
+        return redirect("/register")
 
-    entered_email = db.session.query(User).filter_by(email=username).all()
+    session['username'] = username
+    flash("Logged in!")
 
-    entered_password = db.session.query(User).filter_by(password=password).all()
+    return redirect("/")
 
-    # Pick up here on Wednesday
 
-    if username in entered_email and password in entered_password:
-        return redirect("/")
-    else:
-        flash("Login details incorrect")
+@app.route('/logout', methods=["GET"])
+def logout():
+
+    return render_template("logout_form.html")
+
+
+@app.route('/logout', methods=["POST"])
+def logout_complete():
+
+    del session["username"]
+    flash("Logged out!")
+
+    return redirect("/")
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

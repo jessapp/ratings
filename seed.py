@@ -77,12 +77,11 @@ def load_ratings():
         row = row.rstrip().split("\t")
         print row
         
-        rating_id, movie_id, user_id, score = row
+        user_id, movie_id, score, timestamp = row
 
-        rating = Rating(rating_id=rating_id,
-                      movie_id=movie_id,
-                      user_id=user_id,
-                      score=score)
+        rating = Rating(user_id=user_id,
+                        movie_id=movie_id,
+                        score=score)
 
         db.session.add(rating)
 
