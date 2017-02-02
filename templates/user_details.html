@@ -2,13 +2,15 @@
 {% block content %}
 
 
-{{age}} {{zipcode}}
+Age:{{age}}<br>
+Zipcode: {{zipcode}}<br>
 
     <h2>Movies</h2>
     <ul>
-      {% for movie in movie_titles %}
+      {% for movie, score in movie_titles %}
           <li>
-                {{ movie }}
+                Movie: {{ movie }}<br>
+                Score: {{ score }}
               </a>
           </li>
       {% endfor %}

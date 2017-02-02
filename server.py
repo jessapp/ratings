@@ -6,7 +6,7 @@ from flask import (Flask, jsonify, render_template, redirect, request, flash,
                    session)
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import User, Rating, connect_to_db, db
+from model import User, Rating, Movie, connect_to_db, db
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -59,11 +59,13 @@ def register_process():
         flash("Login information inccorect")
         return redirect("/login")
 
+    user_id = db.session.query(User).filter_by(email=username).one().user_id
+
     session['username'] = username
     flash("Logged in!")
 
 
-    return redirect("/")
+    return redirect("/users/" + str(user_id))
 
 
 @app.route('/logout', methods=["GET"])
@@ -121,15 +123,17 @@ def display_user(user_id):
     
     zipcode = db.session.query(User).filter_by(user_id=user_id).one().zipcode
 
-    movies = db.session.query(Rating).filter_by(user_id=user_id).all().movie_id
+    movies = db.session.query(Rating).filter_by(user_id=user_id).all()
 
     movie_titles = []
 
-    # Start here on Thursday
 
-    for movie_id in movies:
-        movie_name = db.session.query(Movie).filter_by(movie_id=movie_id).all().title
-        movie_titles.append(movie_name)
+    for movie in movies:
+        r_movie_id = movie.movie_id
+        score = movie.score
+        movie_name = db.session.query(Movie).filter_by(movie_id=r_movie_id).one().title
+        movie_titles.append((movie_name, score))
+
 
     return render_template("user_details.html",
                     age=age,

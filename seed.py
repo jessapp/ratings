@@ -49,7 +49,7 @@ def load_movies():
         
         movie_id, title, released_at, _, imdb_url = first_five
 
-        movie_title = title[:-8]
+        movie_title = title[:-7]
 
         if released_at:
             date = datetime.strptime(released_at, "%d-%b-%Y")
