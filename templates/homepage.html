@@ -1,13 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
 
-{% with messages = get_flashed_messages() %}
-   {% if messages %}
-      {% for message in messages %}
-         {{ message }}
-      {% endfor %}
-   {% endif %}
-{% endwith %}
 
 <h1>Ratings</h1>
 
@@ -16,5 +9,19 @@
 
 <h2>Users</h2>
 <p><a href="/users">View all users</a></p>
+
+{% if 'username' in session %}
+<h2>Logout</h2>
+<p><a href="/logout">Log Out Here</a></p> 
+
+{% else %}
+
+<h2>Login</h2>
+<p><a href="/login">Log In Here</a></p>
+
+<h2>Register</h2>
+<p><a href="/register">Register Here</a></p>
+
+{% endif %}
 
 {% endblock %}

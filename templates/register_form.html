@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+    <h1>Register</h1>
+    <p> Please enter the following details to register:</p>
+    <form action="/register" method="POST">
+    Email: <input type="text" name="email"><br>
+    Password: <input type="password" name="password"><br>
+    Age: <input type="text" name="age"><br>
+    Zipcode: <input type="text" name="zipcode"><br>
+    <input type="submit" value="Submit">
+    </form>
+
+{% endblock %}
