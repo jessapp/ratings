@@ -33,11 +33,18 @@ def index():
 
 @app.route('/users')
 def user_list():
-    """Show lsit of users"""
+    """Show list of users"""
 
     users = User.query.all()
     return render_template("user_list.html", users=users)
 
+
+@app.route('/movies')
+def movie_list():
+    """Show list of movies"""
+
+    movies = Movie.query.order_by(Movie.title).all()
+    return render_template("movie_list.html", movies=movies)
 
 @app.route('/login', methods=["GET"])
 def register_form():
@@ -139,6 +146,66 @@ def display_user(user_id):
                     age=age,
                     zipcode=zipcode,
                     movie_titles=movie_titles)
+
+
+@app.route('/movies/<movie_id>', methods=["GET"])
+def display_movie(movie_id):
+
+
+    title = db.session.query(Movie).filter_by(movie_id=movie_id).one().title 
+    
+    released_at = db.session.query(Movie).filter_by(movie_id=movie_id).one().released_at
+
+    imdb_url = db.session.query(Movie).filter_by(movie_id=movie_id).one().imdb_url
+
+    m_ratings = db.session.query(Rating).filter_by(movie_id=movie_id).all()
+
+    movie_ratings = []
+
+
+    for rating in m_ratings:
+        score = rating.score
+        user_id = rating.user_id
+        movie_ratings.append((score, user_id))
+
+
+    return render_template("movie_details.html",
+                    title=title,
+                    released_at=released_at,
+                    imdb_url=imdb_url,
+                    movie_ratings=movie_ratings,
+                    movie_id=movie_id)
+
+
+@app.route('/movies/<int:movie_id>', methods=['POST'])
+def process_rating(movie_id):
+
+    rating = request.form.get("rating")
+
+    current_email = session['username']
+    user_id = db.session.query(User).filter_by(email=current_email).one().user_id
+
+
+    try:
+       new_score = db.session.query(Rating).filter_by(user_id=user_id, movie_id=movie_id).one()
+    except NoResultFound:
+
+        new_rating = Rating(user_id=user_id,
+                            movie_id=movie_id,
+                            score=rating)
+
+        db.session.add(new_rating)
+
+        db.session.commit()
+
+        return redirect("/movies/" + str(movie_id))
+
+    new_score.score = rating
+
+    db.session.commit()
+
+    return redirect("/movies/" + str(movie_id))
+
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
