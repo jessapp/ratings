@@ -24,4 +24,10 @@ IMDB Url: {{ imdb_url }}<br>
     </form>
 
 
+  <p>Average rating: {{ average }}</p>
+  {% if 'username' in session %}
+    {% if prediction %}
+        <p>We predict you will rate this movie {{ prediction }}.</p>
+    {% endif %}
+  {% endif %}
 {% endblock %}

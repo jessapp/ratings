@@ -168,21 +168,60 @@ def display_movie(movie_id):
         user_id = rating.user_id
         movie_ratings.append((score, user_id))
 
+    # Implementing predictive ratings
+
+    movie = Movie.query.get(movie_id)
+
+    email = session.get("username")
+
+    if email: 
+        user_id = db.session.query(User).filter_by(email=email).one().user_id
+
+    if user_id:
+        user_rating = Rating.query.filter_by(
+            movie_id=movie_id, user_id=user_id).first()
+
+    else:
+        user_rating = None
+
+    # Get average rating of movie
+
+    rating_scores = [r.score for r in movie.ratings]
+    avg_rating = float(sum(rating_scores)) / len(rating_scores)
+
+    prediction = None
+
+    # Prediction code: only predict if the user hasn't rated it.
+
+    if (not user_rating) and user_id:
+        user = User.query.get(user_id)
+        if user:
+            prediction = user.predict_rating(movie)
+
+    
+
 
     return render_template("movie_details.html",
                     title=title,
                     released_at=released_at,
                     imdb_url=imdb_url,
                     movie_ratings=movie_ratings,
-                    movie_id=movie_id)
+                    movie_id=movie_id,
+                    movie=movie,
+                    user_rating=user_rating,
+                    average=avg_rating,
+                    prediction=prediction)
 
 
 @app.route('/movies/<int:movie_id>', methods=['POST'])
 def process_rating(movie_id):
 
+    #If a user is logged in, let them add/edit a rating
+
     rating = request.form.get("rating")
 
     current_email = session['username']
+
     user_id = db.session.query(User).filter_by(email=current_email).one().user_id
 
 
